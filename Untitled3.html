@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="Generator" content="EditPlus®">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+  <title>Document</title>
+ </head>
+ <body>
+  <canvas width=1000 height=800 id='myCanvas'></canvas> 
+ </body>
+</html>
+<script>
+var angle=Math.PI/2;
+var line=[];
+function getCenterPoint(startPoint,endPoint){
+	return {x:(startPoint.x+endPoint.x)/2,y:(startPoint.y+endPoint.y)/2};
+}
+function getCenterCircle(startPoint,endPoint){
+	var centerPoint=getCenterPoint(startPoint,endPoint);
+	var triangleSideLength=Math.sqrt((startPoint.x - endPoint.x)*(startPoint.x - endPoint.x)+(startPoint.y - endPoint.y)*(startPoint.y - endPoint.y));
+	console.info(triangleSideLength);
+	var tanAngle = triangleSideLength/(2*Math.tan(angle/2));
+	var theta = Math.atan(-(startPoint.x - endPoint.x)/(startPoint.y - endPoint.y));
+	
+	if(startPoint.x>endPoint.x){
+		return {x:centerPoint.x+Math.cos(theta)*tanAngle,y:centerPoint.y+Math.sin(theta)*tanAngle};
+	}else{
+		return {x:centerPoint.x-Math.cos(theta)*tanAngle,y:centerPoint.y-Math.sin(theta)*tanAngle};
+	}
+	
+	
+	
+}
+function getCircleStartAngle(startPoint,endPoint){
+	if(startPoint.y<endPoint.y){
+		if(startPoint.x>endPoint.x){
+			var value=(startPoint.y - endPoint.y)/(startPoint.x - endPoint.x);
+			if(value<0){
+				value=-value;
+			}
+			var triangleAngle=(Math.PI-angle)/2;
+			var theta=Math.atan(value);
+			return (Math.PI/2+triangleAngle-theta+Math.PI/2);
+		}else{
+			var value=(startPoint.x - endPoint.x)/(startPoint.y - endPoint.y);
+			if(value<0){
+				value=-value;
+			}
+			var triangleAngle=(Math.PI-angle)/2;
+			var theta=Math.atan(value);
+			return (triangleAngle-theta+3/2*Math.PI);
+		}
+	}else{
+		if(startPoint.x<endPoint.x){
+			var value=(startPoint.y - endPoint.y)/(startPoint.x - endPoint.x);
+			if(value<0){
+				value=-value;
+			}
+			var triangleAngle=(Math.PI-angle)/2;
+			var theta=Math.atan(value);
+			return (triangleAngle-theta);
+		}else{
+			var value=(startPoint.x - endPoint.x)/(startPoint.y - endPoint.y);
+			if(value<0){
+				value=-value;
+			}
+			var triangleAngle=(Math.PI-angle)/2;
+			var theta=Math.atan(value);
+			return (triangleAngle-theta+1/2*Math.PI);
+		}
+	}
+	
+}
+
+var myCanvas = document.getElementById("myCanvas");
+ var context = myCanvas.getContext("2d");
+
+ function draw(a,b,c,d,startAngle,color,font){
+	
+ 
+  context.strokeStyle='#000';
+  context.lineWidth=1;
+ 
+  context.beginPath();
+  context.moveTo(a.x, a.y);
+  context.lineTo(b.x, b.y);
+  context.stroke();
+  context.closePath();
+
+   context.strokeStyle='blue';
+  context.lineWidth=1;
+  context.lineCap='square';
+  context.beginPath();
+  context.moveTo(c.x, c.y);
+  context.lineTo(d.x, d.y);
+  context.stroke();
+  context.closePath();
+	/* for(var i=0;i<10;i++){
+		 if(i%2!=0){
+			continue;
+		 }
+		 context.strokeStyle='red';
+	  context.lineWidth=2;
+
+	  context.beginPath();
+	  context.arc(c.x, c.y, Math.sqrt((c.x - a.x)*(c.x - a.x)+(c.y - a.y)*(c.y - a.y)),startAngle+i*angle/10, (startAngle+(i+1)*angle/10), false);
+	   context.stroke();
+		 context.closePath();
+	 } */
+	
+  context.strokeStyle=color;
+  context.lineWidth=font;
+
+  context.beginPath();
+  context.arc(c.x, c.y, Math.sqrt((c.x - a.x)*(c.x - a.x)+(c.y - a.y)*(c.y - a.y)),startAngle, (startAngle+angle), false);
+   context.stroke();
+     context.closePath();
+	
+ }
+ function drawtest(color,font){
+	 context.clearRect(0,0, 1000, 800);
+	 var arr1={};
+	var a={x:500,y:100};
+	var b={x:300,y:400};
+	//var b={x:event.layerX,y:event.layerY};
+	b=getCenterPoint(b,a);
+	var c=getCenterCircle(b,a);
+	var d=getCenterPoint(b,a);
+	arr1.st1=b;
+	arr1.end1=a;
+	arr1.center1=c;
+	arr1.r1=Math.sqrt((a.x - b.x)*(a.x - b.x)+(a.y - b.y)*(a.y - b.y));
+	var startAngle=getCircleStartAngle(b,a);
+	draw(a,b,c,d,startAngle,color,font);
+	a=b;
+	b={x:300,y:400};
+c=getCenterCircle(a,b);
+	 d=getCenterPoint(a,b);
+	startAngle=getCircleStartAngle(a,b);
+	arr1.st2=a;
+	arr1.end2=b;
+	arr1.center2=c;
+	console.info(d);
+	arr1.r2=Math.sqrt((a.x - b.x)*(a.x - b.x)+(a.y - b.y)*(a.y - b.y));
+	line[0]=arr1;
+	draw(a,b,c,d,startAngle,color,font);
+
+ }
+ function checkCross(p1,p2,p3,p4){
+		var v1={x:p1.x-p3.x,y:p1.y-p3.y},
+        v2={x:p2.x-p3.x,y:p2.y-p3.y},
+		v3={x:p4.x-p3.x,y:p4.y-p3.y},
+		v=crossMul(v1,v3)*crossMul(v2,v3)
+		v1={x:p3.x-p1.x,y:p3.y-p1.y}
+		 v2={x:p4.x-p1.x,y:p4.y-p1.y}
+        v3={x:p2.x-p1.x,y:p2.y-p1.y}
+        return (v<=0&&crossMul(v1,v3)*crossMul(v2,v3)<=0)?true:false;
+ }
+ function crossMul(v1,v2){
+        return   v1.x*v2.y-v1.y*v2.x;
+    }
+
+function mouseDownDataSource(event){
+	var p4={x:event.layerX,y:event.layerY};
+	var flag=true;
+	for(var i=0;i<line.length;i++){
+		var obj=line[i];
+		var r=Math.sqrt((p4.x-obj.center2.x)*(p4.x-obj.center2.x)+(p4.y-obj.center2.y)*(p4.y-obj.center2.y));
+		var r1=Math.sqrt((obj.end2.x-obj.center2.x)*(obj.end2.x-obj.center2.x)+(obj.end2.y-obj.center2.y)*(obj.end2.y-obj.center2.y));
+		  context.strokeStyle='#318b92';
+  context.lineWidth=1;
+ 
+  context.beginPath();
+  context.moveTo(obj.center2.x, obj.center2.y);
+  context.lineTo(p4.x, p4.y);
+  context.stroke();
+  context.closePath();
+		if(r1-r<5&&r1-r>-5){
+			if(checkCross(obj.st2,obj.end2,obj.center2,p4)){
+			 drawtest('blue',5);
+			 flag=false;
+			}
+		}
+		
+	}
+	if(flag){
+		// drawtest('red',2);
+	}
+}
+document.getElementById("myCanvas").addEventListener("mousedown",mouseDownDataSource.bind(this),false);
+
+ context.beginPath();
+  context.arc(500, 100, 2,0, 2*Math.PI, false);
+   context.stroke();
+     context.closePath();
+	 drawtest('red',2);
+	 //alert(checkCross({x:0,y:0},{x:5,y:5},{x:5,y:0},{x:6,y:6}));
+</script>
